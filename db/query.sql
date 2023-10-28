@@ -12,6 +12,8 @@
 
 --add a role
     --prompted to enter the name, salary, and department for the role and that is added to the database
+INSERT INTO role (title, salary, department_id)
+    VALUES ()
 
 --add an employee
     --prompted to enter employee's first name, last name, role, and manager, and that is added to the db

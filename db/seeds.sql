@@ -1,3 +1,5 @@
+USE t5nwm6np5lskt3ga;
+
 INSERT INTO departments (department_name)
 VALUES  ("Human Resources"),
         ("Engineering"),
@@ -24,3 +26,12 @@ VALUES  ("Fitzwilliam", "Darcy", 5),
         ("Charlotte", "Lucas", 6),
         ("Colonel", "Fitzwilliam", 2),
         ("Charles", "Bingley", 5);
+
+
+
+UPDATE employees SET manager_id = 6 WHERE id = 1;
+UPDATE employees SET manager_id = 6 WHERE id = 2;
+UPDATE employees SET manager_id = 6 WHERE id = 3;
+UPDATE employees SET manager_id = 4 WHERE id = 7;
+UPDATE employees SET manager_id = 4 WHERE id = 5;
+UPDATE employees SET manager_id = 4 WHERE id = 8;
