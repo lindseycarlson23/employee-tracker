@@ -57,15 +57,15 @@ function init() {
                     // SELECT * FROM roles;
                     viewAllEmployees();
                     break;
-                // case "Add Department":
-                //     addDepartment();
-                //     break;
-                // case "Add Role":
-                //     addRole();
-                //     break;
-                // case "Add Employee":
-                //     addEmployee();
-                //     break;
+                case "Add Department":
+                    addDepartment();
+                    break;
+                case "Add Role":
+                    addRole();
+                    break;
+                case "Add Employee":
+                    addEmployee();
+                    break;
                 case "Quit":
                     process.exit(1)
                 default:
@@ -128,102 +128,206 @@ function viewAllEmployees() {
 };
 
 
-// function addDepartment() {
-//     inquirer.prompt([
-//         {
-//             type: "input",
-//             name: "department_name",
-//             message: "What is the name of the new department?"
-//         }
-//     ])
-//     .then(answers => {
-//         // INSERT INTO departments(department_name) VALUES (answers.department_name)
+function addDepartment() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "department_name",
+            message: "What is the name of the new department?"
+        }
+    ])
+    .then(answers => {
+        // INSERT INTO departments(department_name) VALUES (answers.department_name)
 
-//         // db.query("INSERT INTO departments(department_name, more) VALUES (?, ?);", [answers.department_name, answers.more])
+        // db.query("INSERT INTO departments(department_name, more) VALUES (?, ?);", [answers.department_name, answers.more])
 
-//         db.query("INSERT INTO departments(department_name) VALUES (?);", [answers.department_name], function(err, data) {
-//             if(err) {
-//                 console.log(err)
-//                 return;
-//             }
-//             console.log("Department has been created!")
-//             init();
-//         })
+        db.query("INSERT INTO departments(department_name) VALUES (?);", [answers.department_name], function(err, data) {
+            if(err) {
+                console.log(err)
+                return;
+            }
+            console.log("Department has been created!")
+            init();
+        })
 
-//     })
+    })
+};
+
+function addRole() {
+ 
+    db.query("SELECT departments.id, department_name FROM departments;", function(err, rows) {
+        if(err) {
+            console.log(err)
+            return;
+        }
+        console.log(rows);
+        let departments = rows;
+        const departmentChoices = departments.map(({ id, name}) => ({
+            name: name,
+            value: id
+        }));
+        inquirer.prompt([
+            {
+                name: "title",
+                message: "What is the name of the role?"
+            },
+            {
+                name: "salary",
+                message: "What is the salary for the role?"
+            },
+            {
+                type: "list",
+                name: "department_id",
+                message: "Which department does the role belong to?",
+                choices: departmentChoices
+            }
+        ])
+        .then(answers => {
+            console.log(answers);
+            db.query("INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?);", [answers.title, answers.salary, answers.department_id], function(err, rows) {
+                if(err) {
+                    console.log(err)
+                    return;
+                }
+                console.log("Role has been created!")
+                init();
+            })
+        })
+      
+    })
+ 
+};
+
+// function findAllDepartments() {
+// // Find all departments
+// // findAllDepartments() {
+//     return this.connection.promise().query(
+//       "SELECT department.id, department.name FROM department;"
+//     );
+//   }
+    // db.query("SELECT * FROM departments;", function(err, data) {
+    //     if(err) {
+    //         console.log(err)
+    //         return;
+    //     }
+    //     console.log(data);
+    //     return data;
+    // })
 // };
 
 
-// function addRole() {
-//     inquirer.prompt([
-//         {
-//             type: "input",
-//             name: "title",
-//             message: "What is the role title?"
-//         },
-//         {
-//             type: "input",
-//             name: "salary",
-//             message: "What is the salary?"
-//         },
-//         {
-//             type: "input",
-//             name: "department_id",
-//             message: "What is the department id?"
-//         }
-//     ])
-//     .then(answers => {
-//         // INSERT INTO departments(department_name) VALUES (answers.department_name)
+// employee’s first name, last name, role, and manager, and that employee is added to the database
+function addEmployee() {
+    //role TRYING WITH TO DO TWO QUERIES _ IN PROGRESS!!!!!
+    db.query("WITH roleChoices AS (SELECT roles.id, roles.title FROM roles), ;", function (err, rows) {
+        if(err) {
+            console.log(err)
+            return;
+        }
+        console.log(rows);
+        let roles = rows;
+        const roleChoices = roles.map(({ id, title}) => ({
+            title: title,
+            value: id
+        }));
 
-//         // db.query("INSERT INTO departments(department_name, more) VALUES (?, ?);", [answers.department_name, answers.more])
+        inquirer.prompt([
+            {
+                name: "first_name",
+                message: "What is the first name?"
+            },
+            {
+                name: "last_name",
+                message: "What is the last name?"
+            },
+            {
+                type: "list",
+                name: "role_title",
+                message: "What is the role title?",
+                choices: roleChoices
+            },
+            {
+                type: "list",
+                name: "manager",
+                message: "Who is their manager?",
+                choices: managerChoices
+            }
 
-//         db.query("INSERT INTO roles(title, salary, department_id) VALUES (?, ?, ?);", [answers.title, answers.salary, answers.department_id], function(err, data) {
-//             if(err) {
-//                 console.log(err)
-//                 return;
-//             }
-//             console.log("New role has been created!")
-//             init();
-//         })
+        ])
 
-//     })
-// };
+    })
+
+};
 
 
-// function addEmployee() {
-//     inquirer.prompt([
-//         {
-//             type: "input",
-//             name: "first_name",
-//             message: "What is the first name?"
-//         },
-//         {
-//             type: "input",
-//             name: "last_name",
-//             message: "What is the last name?"
-//         },
-//         {
-//             type: "input",
-//             name: "role_id",
-//             message: "What is the role id?"
-//         }
-//     ])
-//     .then(answers => {
-//         // INSERT INTO departments(department_name) VALUES (answers.department_name)
 
-//         // db.query("INSERT INTO departments(department_name, more) VALUES (?, ?);", [answers.department_name, answers.more])
 
-//         db.query("INSERT INTO roles(title, salary, department_id) VALUES (?, ?, ?);", [answers.title, answers.salary, answers.department_id], function(err, data) {
-//             if(err) {
-//                 console.log(err)
-//                 return;
-//             }
-//             console.log("New role has been created!")
-//             init();
-//         })
 
-//     })
-// };
+
+    // db.findAllRoles()
+    // .then(([rows]) => {
+    //     let departments = rows;
+    //     const departmentChoices = departments.map(({ id, name}) => ({
+    //         name: name,
+    //         value: id
+    //     }));
+    // prompt([
+    //     {
+    //         name: "title",
+    //         message: "What is the name of the role?"
+    //     },
+    //     {
+    //         name: "salary",
+    //         message: "What is the salary for the role?"
+    //     },
+    //     {
+    //         type: "list",
+    //         name: "department_id",
+    //         message: "Which department does the role belong to?",
+    //         choices: departmentChoices
+    //     }
+    // ])
+    //     .then(answers => {
+    //         db.createRole(answers)
+    //             .then(() => console.log('Added ${role.title} to the database'))
+    //             // .then(() => loadMainPrompts())
+    //     })
+    // })
+
+
+
+    // inquirer.prompt([
+    //     {
+    //         type: "input",
+    //         name: "first_name",
+    //         message: "What is the first name?"
+    //     },
+    //     {
+    //         type: "input",
+    //         name: "last_name",
+    //         message: "What is the last name?"
+    //     },
+    //     {
+    //         type: "list",
+    //         name: "role",
+    //         message: "What is the role id?"
+    //     }
+    // ])
+    // .then(answers => {
+    //     // INSERT INTO departments(department_name) VALUES (answers.department_name)
+
+    //     // db.query("INSERT INTO departments(department_name, more) VALUES (?, ?);", [answers.department_name, answers.more])
+
+    //     db.query("INSERT INTO roles(title, salary, department_id) VALUES (?, ?, ?);", [answers.title, answers.salary, answers.department_id], function(err, data) {
+    //         if(err) {
+    //             console.log(err)
+    //             return;
+    //         }
+    //         console.log("New role has been created!")
+    //         init();
+    //     })
+
+    // })
 
 
 init();
