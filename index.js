@@ -198,136 +198,89 @@ function addRole() {
  
 };
 
-// function findAllDepartments() {
-// // Find all departments
-// // findAllDepartments() {
-//     return this.connection.promise().query(
-//       "SELECT department.id, department.name FROM department;"
-//     );
-//   }
-    // db.query("SELECT * FROM departments;", function(err, data) {
-    //     if(err) {
-    //         console.log(err)
-    //         return;
-    //     }
-    //     console.log(data);
-    //     return data;
-    // })
-// };
-
 
 // employee’s first name, last name, role, and manager, and that employee is added to the database
 function addEmployee() {
     //role TRYING WITH TO DO TWO QUERIES _ IN PROGRESS!!!!!
-    db.query("WITH roleChoices AS (SELECT roles.id, roles.title FROM roles), ;", function (err, rows) {
-        if(err) {
-            console.log(err)
-            return;
+    inquirer.prompt([
+        {
+            name: "first_name",
+            message: "What is the first name?"
+        },
+        {
+            name: "last_name",
+            message: "What is the last name?"
         }
-        console.log(rows);
-        let roles = rows;
-        const roleChoices = roles.map(({ id, title}) => ({
-            title: title,
-            value: id
-        }));
-
-        inquirer.prompt([
-            {
-                name: "first_name",
-                message: "What is the first name?"
-            },
-            {
-                name: "last_name",
-                message: "What is the last name?"
-            },
-            {
+    ])
+    .then(res => {
+        let firstName = res.first_name;
+        let lastName = res.last_name;
+        db.query("SELECT roles.id, roles.title FROM roles;", function (err, rows) {
+            if(err) {
+                console.log(err)
+                return;
+            }
+            console.log(rows, "here are the rows");
+            let roles = rows;
+            const roleChoices = roles.map(({ id, title }) => ({
+                name: title,
+                value: id
+            }));       
+        
+            inquirer.prompt({
                 type: "list",
-                name: "role_title",
+                name: "roleId",
                 message: "What is the role title?",
                 choices: roleChoices
-            },
-            {
-                type: "list",
-                name: "manager",
-                message: "Who is their manager?",
-                choices: managerChoices
-            }
+            })
+            .then(res => {
+                // res.role_choice is going to be an object with properties title and id 
+                let roleId= res.roleId;
+                // console.log(role)
+                db.query("SELECT * FROM employees WHERE manager_id IS NULL", function (err, rows) {
+                    if(err) {
+                        console.log(err)
+                        return;
+                    }
+                    console.log(rows);
+                    let managers = rows;
+                    const managerChoices = managers.map(({ id, first_name, last_name }) => ({
+                        name: `${first_name} ${last_name}`,
+                        value: id
+                    }))
 
-        ])
+                    inquirer.prompt({
+                        type: "list",
+                        name: "managerId",
+                        message: "Who is the employee's manager?",
+                        choices: managerChoices
+                    })
+                    .then(res => {
+                        let employee = {
+                            manager_id: res.managerId,
+                            role_id: roleId,
+                            first_name: firstName,
+                            last_name: lastName
+                        }
+                        db.query("INSERT INTO employees(manager_id, role_id, first_name, last_name) VALUES (?, ?, ?, ?);", [employee.manager_id, employee.role_id, employee.first_name, employee.last_name], function (err, rows) {
+                            if(err) {
+                                console.log(err)
+                                return;
+                            }
+                            console.log("Employee has been created!")
+                            init();
+                        })
+                    })
 
-    })
+                })
+            })
+
+        })
+    });
+    
+    
 
 };
-
-
-
-
-
-
-    // db.findAllRoles()
-    // .then(([rows]) => {
-    //     let departments = rows;
-    //     const departmentChoices = departments.map(({ id, name}) => ({
-    //         name: name,
-    //         value: id
-    //     }));
-    // prompt([
-    //     {
-    //         name: "title",
-    //         message: "What is the name of the role?"
-    //     },
-    //     {
-    //         name: "salary",
-    //         message: "What is the salary for the role?"
-    //     },
-    //     {
-    //         type: "list",
-    //         name: "department_id",
-    //         message: "Which department does the role belong to?",
-    //         choices: departmentChoices
-    //     }
-    // ])
-    //     .then(answers => {
-    //         db.createRole(answers)
-    //             .then(() => console.log('Added ${role.title} to the database'))
-    //             // .then(() => loadMainPrompts())
-    //     })
-    // })
-
-
-
-    // inquirer.prompt([
-    //     {
-    //         type: "input",
-    //         name: "first_name",
-    //         message: "What is the first name?"
-    //     },
-    //     {
-    //         type: "input",
-    //         name: "last_name",
-    //         message: "What is the last name?"
-    //     },
-    //     {
-    //         type: "list",
-    //         name: "role",
-    //         message: "What is the role id?"
-    //     }
-    // ])
-    // .then(answers => {
-    //     // INSERT INTO departments(department_name) VALUES (answers.department_name)
-
-    //     // db.query("INSERT INTO departments(department_name, more) VALUES (?, ?);", [answers.department_name, answers.more])
-
-    //     db.query("INSERT INTO roles(title, salary, department_id) VALUES (?, ?, ?);", [answers.title, answers.salary, answers.department_id], function(err, data) {
-    //         if(err) {
-    //             console.log(err)
-    //             return;
-    //         }
-    //         console.log("New role has been created!")
-    //         init();
-    //     })
-
-    // })
 
 
 init();
