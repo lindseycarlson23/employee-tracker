@@ -295,6 +295,9 @@ function addEmployee() {
             choices: employeeChoices
         })
         .then(res => {
+            console.log(JSON.stringify(res) + "chosen employee");
+            let chosenEmployee = res.employeeName;
+            console.log(chosenEmployee + " employee id");
             db.query("SELECT * FROM roles", function (err, rows) {
                 if(err) {
                     console.log(err)
@@ -312,17 +315,20 @@ function addEmployee() {
                 choices: roleChoices
             })
             .then(res => {
-                const index = res.roles;
-                const choice = roleChoices[index];
-                console.log(choice);
-                // db.query(`UPDATE employees SET role_id = ${res.}`, function (err, rows) {
-                //     if(err) {
-                //         console.log(err)
-                //         return;
-                //     }
-                //     console.log("Employee has been updated!")
-                //     init();
-                // })
+                // const index = res.roles;
+                // const choice = roleChoices[index];
+                console.log(res);
+                let roleUpdate = res.roles
+                console.log(roleUpdate);
+                                                //WHERE for the chosen employee row
+                db.query(`UPDATE employees SET role_id = ${roleUpdate} WHERE employees.id = ${chosenEmployee}`, function (err, rows) {
+                    if(err) {
+                        console.log(err)
+                        return;
+                    }
+                    console.log("Employee has been updated!")
+                    init();
+                })
             })
             })
         })
