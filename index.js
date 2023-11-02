@@ -66,6 +66,9 @@ function init() {
                 case "Add Employee":
                     addEmployee();
                     break;
+                case "Update Employee Role":
+                    updateEmployeeRole();
+                    break;
                 case "Quit":
                     process.exit(1)
                 default:
@@ -199,9 +202,7 @@ function addRole() {
 };
 
 
-// employee’s first name, last name, role, and manager, and that employee is added to the database
 function addEmployee() {
-    //role TRYING WITH TO DO TWO QUERIES _ IN PROGRESS!!!!!
     inquirer.prompt([
         {
             name: "first_name",
@@ -220,7 +221,7 @@ function addEmployee() {
                 console.log(err)
                 return;
             }
-            console.log(rows, "here are the rows");
+            // console.log(rows, "here are the rows");
             let roles = rows;
             const roleChoices = roles.map(({ id, title }) => ({
                 name: title,
@@ -234,9 +235,7 @@ function addEmployee() {
                 choices: roleChoices
             })
             .then(res => {
-                // res.role_choice is going to be an object with properties title and id 
                 let roleId= res.roleId;
-                // console.log(role)
                 db.query("SELECT * FROM employees WHERE manager_id IS NULL", function (err, rows) {
                     if(err) {
                         console.log(err)
@@ -271,16 +270,72 @@ function addEmployee() {
                             init();
                         })
                     })
-
                 })
             })
-
         })
     });
-    
+};
+
+
+    function updateEmployeeRole() {
+        db.query("SELECT * FROM employees", function (err, rows) {
+            if(err) {
+                console.log(err)
+                return;
+            }
+            let employees = rows;
+            const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+                name: `${first_name} ${last_name}`,
+                value: id
+            }));
+        inquirer.prompt({
+            type: "list",
+            name: "employeeName",
+            message: "Which employee would you like to update?",
+            choices: employeeChoices
+        })
+        .then(res => {
+            db.query("SELECT * FROM roles", function (err, rows) {
+                if(err) {
+                    console.log(err)
+                    return;
+                }
+                let roles = rows;
+                const roleChoices = roles.map(({ id, title }) => ({
+                    name: title,
+                    value: id
+                }))
+            inquirer.prompt({
+                type: "list",
+                name: "roles",
+                message: "What is the new role?",
+                choices: roleChoices
+            })
+            .then(res => {
+                const index = res.roles;
+                const choice = roleChoices[index];
+                console.log(choice);
+                // db.query(`UPDATE employees SET role_id = ${res.}`, function (err, rows) {
+                //     if(err) {
+                //         console.log(err)
+                //         return;
+                //     }
+                //     console.log("Employee has been updated!")
+                //     init();
+                // })
+            })
+            })
+        })
+    });
+        //show a prompt of all employees
+        //chose an employee
+        //show a prompt of all roles
+        //chose a role
+        //update database
+};
     
 
-};
+
 
 
 init();
