@@ -221,7 +221,7 @@ function addEmployee() {
                 console.log(err)
                 return;
             }
-            // console.log(rows, "here are the rows");
+            
             let roles = rows;
             const roleChoices = roles.map(({ id, title }) => ({
                 name: title,
@@ -315,12 +315,10 @@ function addEmployee() {
                 choices: roleChoices
             })
             .then(res => {
-                // const index = res.roles;
-                // const choice = roleChoices[index];
                 console.log(res);
                 let roleUpdate = res.roles
                 console.log(roleUpdate);
-                                                //WHERE for the chosen employee row
+
                 db.query(`UPDATE employees SET role_id = ${roleUpdate} WHERE employees.id = ${chosenEmployee}`, function (err, rows) {
                     if(err) {
                         console.log(err)
@@ -333,11 +331,6 @@ function addEmployee() {
             })
         })
     });
-        //show a prompt of all employees
-        //chose an employee
-        //show a prompt of all roles
-        //chose a role
-        //update database
 };
     
 
